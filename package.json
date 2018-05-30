@@ -1,0 +1,19 @@
+{
+  "name": "demo-azure-maps",
+  "version": "1.0.0",
+  "description": "",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matlegdal/demo-azure-maps.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matlegdal/demo-azure-maps/issues"
+  },
+  "homepage": "https://github.com/matlegdal/demo-azure-maps#readme"
+}
