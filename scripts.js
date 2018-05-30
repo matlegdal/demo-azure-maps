@@ -1,6 +1,7 @@
+const fujitsu = [-71.306222, 46.830545];
 var map = new atlas.Map("map", {
     "subscription-key": subscriptionKey,
-    center: [-118.270293, 34.039737],
+    center: fujitsu,
     zoom: 14
 });
 /* Search Info Panel */
@@ -14,12 +15,13 @@ map.addPins(searchPins, {
     cluster: false,
     icon: "pin-round-darkblue"
 });
+
 function boundingBoxOfPositions(positions) {
     var swLon = 180;
     var swLat = 90;
     var neLon = -180;
     var neLat = -90;
-    for (i = 0; i < positions.length; i++) {
+    for (let i = 0; i < positions.length; i++) {
         var position = positions[i];
         if (position[0] < swLon) {
             swLon = position[0];
@@ -36,6 +38,7 @@ function boundingBoxOfPositions(positions) {
     }
     return [swLon, swLat, neLon, neLat];
 }
+
 function buildPoiPopupContent(poiProperties) {
     var poiTitleBox = document.createElement("div");
     poiTitleBox.classList.add("poi-title-box", "font-segoeui-b");
@@ -83,6 +86,7 @@ map.addEventListener("click", searchLayerName, function (event) {
     searchPopup.open(map);
 });
 var shouldChangeCamera = false;
+
 function searchResultsHandler() {
     searchPins = [];
     searchInfoPanelBody.innerHTML = "";
@@ -98,11 +102,19 @@ function searchResultsHandler() {
     }
     if (this.readyState === 4 && this.status === 200) {
         var response = JSON.parse(this.responseText);
-        var geographyResults = response.results.filter(function (result) { return result.type === "Geography" }) || [];
-        var addressResults = response.results.filter(function (result) { return result.type === "Point Address" }) || [];
-        var poiResults = response.results.filter(function (result) { return result.type === "POI" }) || [];
+        var geographyResults = response.results.filter(function (result) {
+            return result.type === "Geography";
+        }) || [];
+        var addressResults = response.results.filter(function (result) {
+            return result.type === "Point Address";
+        }) || [];
+        var poiResults = response.results.filter(function (result) {
+            return result.type === "POI";
+        }) || [];
         if (geographyResults.length !== 0) {
-            geographyResults.sort(function (a, b) { return b.score - a.score });
+            geographyResults.sort(function (a, b) {
+                return b.score - a.score;
+            });
             var geographyBestResult = geographyResults[0];
             searchPins = geographyResults.map(function (geographyResult) {
                 var geographyPosition = [geographyResult.position.lon, geographyResult.position.lat];
@@ -128,7 +140,9 @@ function searchResultsHandler() {
                 });
             }
         } else if (addressResults.length !== 0) {
-            addressResults.sort(function (a, b) { return b.score - a.score });
+            addressResults.sort(function (a, b) {
+                return b.score - a.score;
+            });
             var addressBestResult = addressResults[0];
             var addressPosition = [
                 addressBestResult.position.lon,
@@ -158,7 +172,7 @@ function searchResultsHandler() {
             if (shouldChangeCamera) {
                 map.setCameraBounds({
                     bounds: boundingBoxOfPositions(poiResults.map(function (poi) {
-                        return [poi.position.lon, poi.position.lat]
+                        return [poi.position.lon, poi.position.lat];
                     }))
                 });
                 map.setCamera({
@@ -175,13 +189,13 @@ function searchResultsHandler() {
             noResultListItemElement.appendChild(noResultsDetailsElement);
             searchInfoPanelBody.appendChild(noResultListItemElement);
         }
-        for (i = 0; i < searchPins.length; i++) {
+        for (let i = 0; i < searchPins.length; i++) {
             var searchPin = searchPins[i];
             var resultListItemElement = document.createElement("li");
             resultListItemElement.dataset.lon = searchPin.geometry.coordinates[0];
             resultListItemElement.dataset.lat = searchPin.geometry.coordinates[1];
-            resultListItemElement.dataset.search = (searchPin.properties.name) ? searchPin.properties.name
-                + ", " + searchPin.properties.address : searchPin.properties.address;
+            resultListItemElement.dataset.search = (searchPin.properties.name) ? searchPin.properties.name +
+                ", " + searchPin.properties.address : searchPin.properties.address;
             if (searchPin.properties.name) {
                 resultListItemElement.dataset.name = searchPin.properties.name;
             }
@@ -213,7 +227,7 @@ function searchResultsHandler() {
                 resultListItemUrlElement.appendChild(linkElement);
                 resultListItemElement.appendChild(resultListItemUrlElement);
             }
-            resultListItemElement.addEventListener("mouseover", function (event) {
+            resultListItemElement.addEventListener("mouseover", function () {
                 searchPopup.setPopupOptions({
                     position: [this.dataset.lon, this.dataset.lat],
                     content: buildPoiPopupContent({
@@ -225,7 +239,7 @@ function searchResultsHandler() {
                 });
                 searchPopup.open(map);
             });
-            resultListItemElement.addEventListener("click", function (event) {
+            resultListItemElement.addEventListener("click", function () {
                 shouldChangeCamera = true;
                 document.getElementById("search-input").value = this.dataset.search;
                 search(searchResultsHandler);
@@ -237,7 +251,7 @@ function searchResultsHandler() {
             overwrite: true
         });
     }
-};
+}
 var search = function (responseHandler) {
     var searchInputValue = document.getElementById("search-input").value;
     var xhttp = new XMLHttpRequest();
@@ -250,7 +264,7 @@ var search = function (responseHandler) {
     url += "&lon=" + map.getCamera().center[0];
     xhttp.open("GET", url, true);
     xhttp.send();
-}
+};
 var searchInput = document.getElementById("search-input");
 searchInput.addEventListener("keyup", function (e) {
     shouldChangeCamera = (e.keyCode === 13) ? true : false;
@@ -262,7 +276,7 @@ plusZoomElement.classList.add("zoom", "font-segoeui-b");
 plusZoomElement.id = "zoom-plus";
 plusZoomElement.innerText = "+";
 document.body.appendChild(plusZoomElement);
-plusZoomElement.addEventListener("click", function (event) {
+plusZoomElement.addEventListener("click", function () {
     var currZoom = map.getCamera().zoom;
     map.setCamera({
         zoom: currZoom + 1
@@ -274,7 +288,7 @@ minusZoomElement.classList.add("zoom", "font-segoeui-b");
 minusZoomElement.id = "zoom-minus";
 minusZoomElement.innerText = "-";
 document.body.appendChild(minusZoomElement);
-minusZoomElement.addEventListener("click", function (event) {
+minusZoomElement.addEventListener("click", function () {
     var currZoom = map.getCamera().zoom;
     map.setCamera({
         zoom: currZoom - 1
